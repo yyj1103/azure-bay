@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AZURE BAY — Open-World Crime Game</title>
+<style>
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #1a1210; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+  #game { position: fixed; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
+  #status { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  #hud { position: fixed; inset: 0; pointer-events: none; color: #f4f1e8; font-size: 13px; z-index: 5; }
+  .panel { background: rgba(16,24,32,.82); border: 1px solid rgba(255,179,71,.45); border-radius: 8px; padding: 10px 12px; box-shadow: 0 2px 12px rgba(0,0,0,.45); }
+  #mission-card { position: absolute; top: 12px; left: 12px; width: 308px; }
+  .job-no { color: #ffb347; font-weight: 800; letter-spacing: 1px; font-size: 12px; }
+  .job-title { font-size: 19px; font-weight: 900; letter-spacing: .5px; margin: 2px 0; }
+  .job-contact { color: #ff8fb0; font-size: 12px; font-weight: 700; }
+  .job-dialogue { font-style: italic; color: #d8d2c4; margin: 5px 0; line-height: 1.35; }
+  #objective-line { font-weight: 700; color: #ffd94d; line-height: 1.3; }
+  #mission-stage { color: #9fd8e8; font-size: 12px; margin-top: 4px; }
+  #mission-timer { color: #ffb347; font-weight: 800; margin-top: 2px; }
+  .stagebar { height: 6px; background: #2a3644; border-radius: 3px; margin-top: 7px; overflow: hidden; }
+  .stagebar > div { height: 100%; width: 40%; background: linear-gradient(90deg,#ffb347,#ff5c8a); }
+  #top-right { position: absolute; top: 12px; right: 12px; text-align: right; }
+  #wanted-stars { font-size: 26px; letter-spacing: 3px; color: #ffd94d; text-shadow: 0 0 8px rgba(255,64,64,.7); }
+  #cash { font-size: 24px; font-weight: 900; color: #7ee787; }
+  #respect, #district { font-size: 12px; color: #d8d2c4; margin-top: 2px; }
+  #dispatch-panel { position: absolute; top: 118px; right: 12px; width: 292px; font-size: 12px; line-height: 1.5; }
+  .dp-title { color: #4d8dff; font-weight: 800; letter-spacing: .5px; border-bottom: 1px solid rgba(77,141,255,.4); margin-bottom: 4px; padding-bottom: 3px; }
+  .dp-row b { color: #ffd94d; }
+  .tag { background: #ff4040; color: #fff; border-radius: 3px; padding: 0 4px; font-size: 11px; font-weight: 800; }
+  #bottom-left { position: absolute; left: 12px; bottom: 12px; }
+  #minimap { border: 2px solid rgba(255,179,71,.6); border-radius: 8px; background: #16222e; display: block; }
+  .bar-row { display: flex; align-items: center; gap: 6px; margin-top: 6px; font-size: 11px; font-weight: 700; }
+  .bar { flex: 1; height: 9px; background: #2a3644; border-radius: 4px; overflow: hidden; }
+  .bar > div { height: 100%; }
+  #health-fill { background: linear-gradient(90deg,#37c978,#7ee787); width: 100%; }
+  #armour-fill { background: linear-gradient(90deg,#4d8dff,#9fd8e8); width: 50%; }
+  #winlose-line { margin-top: 6px; font-size: 11px; color: #c9c2b2; max-width: 240px; line-height: 1.35; }
+  #bottom-right { position: absolute; right: 12px; bottom: 12px; text-align: right; }
+  #crew-abilities { margin-bottom: 8px; font-size: 12px; }
+  .crew-card { background: rgba(16,24,32,.82); border: 1px solid rgba(127,179,163,.5); border-radius: 6px; padding: 5px 8px; margin-top: 4px; display: inline-block; }
+  #weapon-slots { display: flex; flex-direction: column; gap: 4px; align-items: flex-end; }
+  .wslot { background: rgba(16,24,32,.82); border: 1px solid rgba(244,241,232,.25); border-radius: 5px; padding: 4px 8px; font-size: 12px; font-weight: 700; min-width: 170px; text-align: left; }
+  .wslot span { float: right; color: #ffd94d; }
+  .wslot.active { border-color: #ffb347; background: rgba(255,179,71,.22); }
+  .wslot.locked { opacity: .45; }
+  #car-panel { position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); text-align: center; background: rgba(16,24,32,.82); border: 1px solid rgba(255,179,71,.45); border-radius: 8px; padding: 8px 18px; }
+  #speed { font-size: 26px; font-weight: 900; color: #fff; }
+  #car-name { font-weight: 800; color: #ffb347; letter-spacing: 1px; }
+  #car-cond, #radio { font-size: 12px; color: #d8d2c4; }
+  #banner-wrap { position: absolute; top: 22%; left: 50%; transform: translateX(-50%); text-align: center; display: none; }
+  #banner { font-size: 44px; font-weight: 900; letter-spacing: 2px; color: #ffd94d; text-shadow: 0 3px 0 #7a2c00, 0 0 24px rgba(255,180,60,.8); }
+  #banner-sub { font-size: 16px; color: #fff; text-shadow: 0 2px 6px #000; margin-top: 4px; }
+  .screen { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; z-index: 10; color: #f4f1e8; }
+  #title-screen { background: linear-gradient(rgba(16,24,32,.30), rgba(16,24,32,.88)); }
+  #pause-screen, #over-screen { background: rgba(10,14,20,.78); }
+  .screen-inner { max-width: 860px; width: 92%; display: flex; gap: 28px; }
+  .screen-col { flex: 1; }
+  .logo { font-size: 64px; font-weight: 900; letter-spacing: 4px; line-height: .95; color: #fff; text-shadow: 0 4px 0 #b33c1e, 0 0 34px rgba(255,140,60,.9); }
+  .logo span { color: #ffb347; }
+  .tagline { font-size: 15px; color: #ffd9a0; margin: 8px 0 16px; letter-spacing: 1px; }
+  #save-line { font-size: 13px; color: #7ee787; font-weight: 700; margin-bottom: 10px; }
+  #mission-list { display: flex; flex-direction: column; gap: 5px; }
+  .ml-row { background: rgba(16,24,32,.85); border: 1px solid rgba(244,241,232,.25); border-radius: 6px; padding: 7px 10px; font-size: 13px; cursor: pointer; pointer-events: auto; }
+  .ml-row:hover { border-color: #ffb347; }
+  .ml-row.done { opacity: .65; }
+  .ml-row span { float: right; color: #ffd94d; font-weight: 700; }
+  .btn { display: inline-block; pointer-events: auto; cursor: pointer; background: linear-gradient(180deg,#ffb347,#ff7a3c); color: #20140a; font-weight: 900; letter-spacing: 1px; border: none; border-radius: 8px; padding: 12px 22px; font-size: 15px; margin-top: 14px; }
+  .btn.ghost { background: rgba(244,241,232,.14); color: #f4f1e8; border: 1px solid rgba(244,241,232,.4); }
+  .controls { font-size: 13px; line-height: 1.7; color: #d8d2c4; }
+  .controls b { color: #ffd94d; }
+  .screen h2 { font-size: 40px; margin: 0 0 6px; letter-spacing: 2px; }
+  #garage-panel { position: absolute; top: 50%; right: 12px; transform: translateY(-50%); width: 270px; display: none; z-index: 6; }
+  #garage-panel h3 { margin: 0 0 6px; color: #ffb347; letter-spacing: 1px; }
+  .up-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-top: 1px solid rgba(244,241,232,.15); font-size: 13px; }
+  .up-row button { pointer-events: auto; cursor: pointer; background: #7ee787; border: none; border-radius: 5px; padding: 5px 10px; font-weight: 800; }
+  .up-row button:disabled { background: #555; color: #999; }
+</style>
+<script type="importmap">{ "imports": { "three": "./vendor/three.module.min.js" } }</script>
+</head>
+<body>
+<canvas id="game" aria-label="AZURE BAY: open-world crime game"></canvas>
+<p id="status" role="status" aria-live="polite"></p>
+<div id="hud" style="display:none">
+  <div id="mission-card" class="panel" style="display:none">
+    <div class="job-no">JOB 1/8</div>
+    <div class="job-title">SUNSET PICKUP</div>
+    <div class="job-contact" id="contact-line">MARISOL — Fixer</div>
+    <div class="job-dialogue">“Meet me at the marina pier.”</div>
+    <div id="objective-line">Drive to the Marina Pier</div>
+    <div id="mission-stage">STAGE 1/1</div>
+    <div id="mission-timer">REWARD $800</div>
+    <div class="stagebar"><div></div></div>
+  </div>
+  <div id="top-right">
+    <div id="wanted-stars">☆☆☆☆☆</div>
+    <div id="cash">$1,250</div>
+    <div id="respect">NOBODY · 0 REP</div>
+    <div id="district">MARINA · GOLDEN HOUR · 7:42 PM</div>
+  </div>
+  <div id="dispatch-panel" class="panel"><div class="dp-title">ABPD DISPATCH — AZURE BAY PD</div><div class="dp-row">ALL UNITS CLEAR — NO ACTIVE PURSUIT</div></div>
+  <div id="bottom-left">
+    <canvas id="minimap" width="176" height="176"></canvas>
+    <div class="bar-row"><span>HP</span><div class="bar"><div id="health-fill"></div></div></div>
+    <div class="bar-row"><span>ARM</span><div class="bar"><div id="armour-fill"></div></div></div>
+    <div id="health-text">HP 100 · ARMOUR 50</div>
+    <div id="winlose-line">WIN: finish the job and reach the marker · LOSE: busted by ABPD or wasted</div>
+  </div>
+  <div id="bottom-right">
+    <div id="crew-abilities"></div>
+    <div id="weapon-slots"></div>
+  </div>
+  <div id="car-panel">
+    <div id="speed">ON FOOT</div>
+    <div id="car-name">AZURE BAY — ON FOOT</div>
+    <div id="car-cond">PRESS E NEAR A CAR TO STEAL IT</div>
+    <div id="radio">AZURE 98.5 FM — “Neon Coastline — PALM STATIC”</div>
+  </div>
+  <div id="banner-wrap"><div id="banner"></div><div id="banner-sub"></div></div>
+</div>
+<div id="garage-panel" class="panel">
+  <h3>DEACON'S GARAGE — UPGRADES</h3>
+  <div>Your ride, your rules. Cash talks.</div>
+  <div class="up-row"><span>🛡 Armor Plating +50</span><button data-upgrade="armor" data-price="1500" data-name="Armor Plating">BUY $1,500</button></div>
+  <div class="up-row"><span>⚙ Turbo Engine +6 MPH</span><button data-upgrade="engine" data-price="2500" data-name="Turbo Engine">BUY $2,500</button></div>
+  <div class="up-row"><span>🛞 Sport Tires +Grip</span><button data-upgrade="tires" data-price="1200" data-name="Sport Tires">BUY $1,200</button></div>
+  <button id="garage-close" class="btn ghost" style="margin-top:10px">CLOSE</button>
+</div>
+<div id="title-screen" class="screen">
+  <div class="screen-inner">
+    <div class="screen-col">
+      <div class="logo">AZURE<br><span>BAY</span></div>
+      <div class="tagline">8 STORY JOBS · 5-STAR WANTED · CARJACKING · CREW · RADIO · SAVES</div>
+      <div id="save-line">SAVE — $1,250 · 0/8 JOBS DONE · NOBODY</div>
+      <div id="mission-list"></div>
+      <button id="start-roam" class="btn">▶ FREE ROAM</button>
+    </div>
+    <div class="screen-col">
+      <h2 style="font-size:26px">HOW TO PLAY</h2>
+      <div class="controls">
+        <b>W A S D</b> — drive / walk &nbsp;·&nbsp; <b>SHIFT</b> — run / boost<br>
+        <b>E</b> — steal / exit car &nbsp;·&nbsp; <b>MOUSE</b> — shoot on foot<br>
+        <b>1–6</b> — weapons &nbsp;·&nbsp; <b>Q</b> — crew ability: Deacon's Ram<br>
+        <b>R</b> — radio &nbsp;·&nbsp; <b>H</b> — horn &nbsp;·&nbsp; <b>P</b> — pause<br><br>
+        <b>WIN:</b> finish the job and reach the marker.<br>
+        <b>LOSE:</b> busted by ABPD or wasted.<br><br>
+        Steal cars, dodge the ABPD, earn respect from NOBODY to BAY LEGEND.
+        Every job pays cash — spend it at Deacon's Garage.
+      </div>
+    </div>
+  </div>
+</div>
+<div id="pause-screen" class="screen">
+  <div class="screen-inner" style="max-width:560px">
+    <div class="screen-col">
+      <h2>PAUSED</h2>
+      <div class="controls">The bay waits for no one. Except now.</div>
+      <button id="resume-btn" class="btn">▶ RESUME</button>
+      <button id="restart-btn" class="btn ghost">↻ RESTART</button>
+      <button id="quit-title-btn" class="btn ghost">TITLE SCREEN</button>
+    </div>
+  </div>
+</div>
+<div id="over-screen" class="screen">
+  <div class="screen-inner" style="max-width:560px">
+    <div class="screen-col">
+      <h2 id="over-title">WASTED</h2>
+      <div id="over-sub" class="controls">Cash kept: $0 · Jobs done: 0/8</div>
+      <button id="over-restart-btn" class="btn">↻ TRY AGAIN</button>
+      <button id="over-title-btn" class="btn ghost">TITLE SCREEN</button>
+    </div>
+  </div>
+</div>
+<script type="module" src="./src/main.js"></script>
+</body>
+</html>

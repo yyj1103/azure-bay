@@ -53,7 +53,7 @@ export function createSim(canvas, seed) {
     cash: save.cash, respect: save.respect, station: save.station,
     crewCooldown: 0, crewReady: true, bustedTimer: 0, banner: null,
     garageOpen: false, shop: null, roadblockTimer: 0, hitPedCooldown: 0,
-    muzzle: null, muzzleT: 0, overReason: '', startedAt: 0,
+    muzzleT: 0, overReason: '', startedAt: 0,
   };
   return s;
 }

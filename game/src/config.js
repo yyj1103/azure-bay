@@ -16,12 +16,22 @@ export const PALETTE = {
 };
 
 export const DISTRICTS = [
-  { name: 'MARINA', x0: -360, z0: 240, x1: 360, z1: 360 },
+  { name: 'MARINA', x0: -360, z0: 240, x1: 0, z1: 360 },
+  { name: 'BEACHFRONT', x0: 0, z0: 240, x1: 360, z1: 360 },
   { name: 'DOWNTOWN', x0: -120, z0: -120, x1: 120, z1: 120 },
-  { name: 'HARBOR', x0: 180, z0: -360, x1: 360, z1: 240 },
-  { name: 'OLD TOWN', x0: -360, z0: -360, x1: -120, z1: 240 },
-  { name: 'HILLS', x0: -120, z0: -360, x1: 180, z1: -120 },
+  { name: 'HARBOUR', x0: 60, z0: -360, x1: 360, z1: 240 },
+  { name: 'OLD TOWN', x0: -360, z0: -360, x1: 60, z1: 240 },
 ];
+
+// Standing a crew earns in a district, from the respect its jobs pay.
+// NEUTRAL <20, KNOWN 20-39, RESPECTED 40-79, LEGEND 80+.
+export const DISTRICT_NAMES = ['MARINA', 'DOWNTOWN', 'HARBOUR', 'OLD TOWN', 'BEACHFRONT'];
+export function districtStanding(points) {
+  if (points >= 80) return 'LEGEND';
+  if (points >= 40) return 'RESPECTED';
+  if (points >= 20) return 'KNOWN';
+  return 'NEUTRAL';
+}
 
 export const VEHICLES = {
   comet: { name: 'COMET GT', color: '#e8452c', topSpeed: 46, accel: 22, grip: 2.6, price: 0 },

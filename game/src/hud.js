@@ -6,7 +6,7 @@
 // pause / game-over. The minimap is a small 2D canvas: streets, the beach,
 // the player arrow, the objective marker and police dots.
 import { MISSIONS } from './missions.js';
-import { WEAPONS, RADIO } from './config.js';
+import { WEAPONS, RADIO, DISTRICT_NAMES, districtStanding } from './config.js';
 import { respectRank } from './save.js';
 
 function el(id) { return document.getElementById(id); }
@@ -23,6 +23,7 @@ export function createHud() {
     missionList: el('mission-list'), saveLine: el('save-line'), objective: el('objective-line'),
     timer: el('mission-timer'), stage: el('mission-stage'), contact: el('contact-line'),
     crew: el('crew-abilities'), winlose: el('winlose-line'),
+    districtPanel: el('district-panel'), titleDistricts: el('title-districts'),
   };
 }
 
@@ -30,7 +31,7 @@ export function updateHud(h, s) {
   // Mission card, top-left.
   const m = s.mission;
   if (m) {
-    h.mission.querySelector('.job-no').textContent = `JOB ${m.index + 1}/8`;
+    h.mission.querySelector('.job-no').textContent = `JOB ${m.index + 1}/10`;
     h.mission.querySelector('.job-title').textContent = m.def.title;
     h.mission.querySelector('.job-contact').textContent = `${m.def.contact.toUpperCase()} — ${s.contactRole}`;
     h.mission.querySelector('.job-dialogue').textContent = `“${m.def.dialogue}”`;
@@ -48,6 +49,17 @@ export function updateHud(h, s) {
   h.cash.textContent = `$${Math.floor(s.cash).toLocaleString()}`;
   h.respect.textContent = `${respectRank(s.respect)} · ${s.respect} REP`;
   h.district.textContent = `${s.district} · ${s.timeOfDay}`;
+  // District standing panel: all five districts, current one marked.
+  if (h.districtPanel && s.standing) {
+    let dh = '<div class="dp-title">DISTRICT STANDING</div>';
+    for (const name of DISTRICT_NAMES) {
+      const pts = s.standing[name] || 0;
+      const lvl = districtStanding(pts);
+      const here = name === s.district ? ' ◉ YOU' : '';
+      dh += `<div class="dp-row${name === s.district ? ' here' : ''}"><b>${name}</b> · ${lvl} · ${pts} PTS${here}</div>`;
+    }
+    h.districtPanel.innerHTML = dh;
+  }
   // Dispatch panel: named units, distance in metres, role.
   let html = '<div class="dp-title">ABPD DISPATCH — AZURE BAY PD</div>';
   if (s.units.length === 0 && !s.heli) html += '<div class="dp-row">ALL UNITS CLEAR — NO ACTIVE PURSUIT</div>';
@@ -122,10 +134,16 @@ export function setScreen(h, name, save) {
   h.pause.style.display = name === 'pause' ? 'flex' : 'none';
   h.over.style.display = name === 'over' ? 'flex' : 'none';
   if (name === 'title' && save) {
-    h.saveLine.textContent = `SAVE — $${save.cash.toLocaleString()} · ${save.jobsDone.length}/8 JOBS DONE · ${respectRank(save.respect)}`;
+    h.saveLine.textContent = `SAVE — $${save.cash.toLocaleString()} · ${save.jobsDone.length}/10 JOBS DONE · ${respectRank(save.respect)}`;
     h.missionList.innerHTML = MISSIONS.map((m, i) => {
       const done = save.jobsDone.includes(m.id);
       return `<div class="ml-row${done ? ' done' : ''}" data-job="${i}"><b>${m.id}.</b> ${m.title} <span>${done ? '✓ DONE' : `$${m.reward.toLocaleString()} · ${m.contact.toUpperCase()}`}</span></div>`;
     }).join('');
+    if (h.titleDistricts && save.standing) {
+      h.titleDistricts.innerHTML = DISTRICT_NAMES.map((name) => {
+        const pts = save.standing[name] || 0;
+        return `<div class="ml-row"><b>${name}</b> — ${districtStanding(pts)} <span>${pts} PTS</span></div>`;
+      }).join('');
+    }
   }
 }

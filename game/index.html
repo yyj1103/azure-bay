@@ -26,6 +26,8 @@
   #cash { font-size: 24px; font-weight: 900; color: #7ee787; }
   #respect, #district { font-size: 12px; color: #d8d2c4; margin-top: 2px; }
   #dispatch-panel { position: absolute; top: 118px; right: 12px; width: 292px; font-size: 12px; line-height: 1.5; }
+  #district-panel { position: absolute; top: 222px; left: 12px; width: 308px; font-size: 12px; line-height: 1.55; }
+  .dp-row.here { background: rgba(255,179,71,.14); border-radius: 3px; }
   .dp-title { color: #4d8dff; font-weight: 800; letter-spacing: .5px; border-bottom: 1px solid rgba(77,141,255,.4); margin-bottom: 4px; padding-bottom: 3px; }
   .dp-row b { color: #ffd94d; }
   .tag { background: #ff4040; color: #fff; border-radius: 3px; padding: 0 4px; font-size: 11px; font-weight: 800; }
@@ -84,7 +86,7 @@
 <p id="status" role="status" aria-live="polite"></p>
 <div id="hud" style="display:none">
   <div id="mission-card" class="panel" style="display:none">
-    <div class="job-no">JOB 1/8</div>
+    <div class="job-no">JOB 1/10</div>
     <div class="job-title">SUNSET PICKUP</div>
     <div class="job-contact" id="contact-line">MARISOL — Fixer</div>
     <div class="job-dialogue">“Meet me at the marina pier.”</div>
@@ -100,6 +102,7 @@
     <div id="district">MARINA · GOLDEN HOUR · 7:42 PM</div>
   </div>
   <div id="dispatch-panel" class="panel"><div class="dp-title">ABPD DISPATCH — AZURE BAY PD</div><div class="dp-row">ALL UNITS CLEAR — NO ACTIVE PURSUIT</div></div>
+  <div id="district-panel" class="panel"><div class="dp-title">DISTRICT STANDING</div><div class="dp-row"><b>MARINA</b> · NEUTRAL · 0 PTS</div><div class="dp-row"><b>DOWNTOWN</b> · NEUTRAL · 0 PTS</div><div class="dp-row"><b>HARBOUR</b> · NEUTRAL · 0 PTS</div><div class="dp-row"><b>OLD TOWN</b> · NEUTRAL · 0 PTS</div><div class="dp-row"><b>BEACHFRONT</b> · NEUTRAL · 0 PTS</div></div>
   <div id="bottom-left">
     <canvas id="minimap" width="176" height="176"></canvas>
     <div class="bar-row"><span>HP</span><div class="bar"><div id="health-fill"></div></div></div>
@@ -131,8 +134,8 @@
   <div class="screen-inner">
     <div class="screen-col">
       <div class="logo">AZURE<br><span>BAY</span></div>
-      <div class="tagline">8 STORY JOBS · 5-STAR WANTED · CARJACKING · CREW · RADIO · SAVES</div>
-      <div id="save-line">SAVE — $1,250 · 0/8 JOBS DONE · NOBODY</div>
+      <div class="tagline">10 STORY JOBS · 5 DISTRICTS · 5-STAR WANTED · CARJACKING · CREW · RADIO · SAVES</div>
+      <div id="save-line">SAVE — $1,250 · 0/10 JOBS DONE · NOBODY</div>
       <div id="mission-list"></div>
       <button id="start-roam" class="btn">▶ FREE ROAM</button>
     </div>
@@ -148,6 +151,9 @@
         Steal cars, dodge the ABPD, earn respect from NOBODY to BAY LEGEND.
         Every job pays cash — spend it at Deacon's Garage.
       </div>
+      <h2 style="font-size:26px;margin-top:18px">DISTRICT STANDING</h2>
+      <div class="controls">Finish jobs to earn standing in each district — NEUTRAL, KNOWN, RESPECTED, LEGEND.</div>
+      <div id="title-districts" style="display:flex;flex-direction:column;gap:5px;margin-top:8px"></div>
     </div>
   </div>
 </div>
@@ -166,7 +172,7 @@
   <div class="screen-inner" style="max-width:560px">
     <div class="screen-col">
       <h2 id="over-title">WASTED</h2>
-      <div id="over-sub" class="controls">Cash kept: $0 · Jobs done: 0/8</div>
+      <div id="over-sub" class="controls">Cash kept: $0 · Jobs done: 0/10</div>
       <button id="over-restart-btn" class="btn">↻ TRY AGAIN</button>
       <button id="over-title-btn" class="btn ghost">TITLE SCREEN</button>
     </div>

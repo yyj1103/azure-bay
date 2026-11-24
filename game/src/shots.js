@@ -30,24 +30,29 @@ function idle(s, seconds) {
 export function stageShot(name, s) {
   resetRun(s);
   s.cash = 12480; s.respect = 35; s.save.cash = 12480; s.save.respect = 35;
+  // Mid-game save so the district panel and title screen show real standing:
+  // jobs 1-7 done — MARINA KNOWN, DOWNTOWN RESPECTED, HARBOUR KNOWN,
+  // OLD TOWN KNOWN, BEACHFRONT NEUTRAL.
+  s.save.jobsDone = [1, 2, 3, 4, 5, 6, 7];
+  s.save.standing = { MARINA: 30, DOWNTOWN: 50, HARBOUR: 35, 'OLD TOWN': 30, BEACHFRONT: 0 };
   s.screen = 'play';
   if (name === 'chase') {
-    // Cover: third-person chase down a downtown avenue, three cruisers on the
-    // tail, CONDOR-1 overhead with its spotlight, a roadblock and an explosion
-    // ahead, job 3 in its delivery stage.
-    startJob(s, 2);
-    s.mission.stage = 1;
-    s.player.x = 0; s.player.z = -90; s.player.heading = 0;
+    // Cover: job 9, the AZURE GRAND PRIX street race — third-person chase
+    // down a downtown avenue toward the first gate, three cruisers on the
+    // tail, CONDOR-1 overhead, a roadblock and an explosion ahead, the race
+    // timer and the district panel on show.
+    startJob(s, 8);
+    s.player.x = 0; s.player.z = -120; s.player.heading = 0;
     const car = s.parked[0];
-    car.x = 0; car.z = -90; car.heading = 0; car.speed = 30;
+    car.x = 0; car.z = -120; car.heading = 0; car.speed = 30;
     s.player.car = car; s.player.inCar = car;
     s.police.wanted = 3; s.police.heat = 1; s.police.lastCrime = s.time;
     for (let i = 0; i < 3; i += 1) {
-      const u = spawnPoliceUnit(s.THREE, s.police, -8 + i * 8, -130 - i * 16, s.random);
+      const u = spawnPoliceUnit(s.THREE, s.police, -8 + i * 8, -160 - i * 16, s.random);
       u.car.speed = 34; s.r.scene.add(u.car.mesh);
     }
     s.r.shake = 0;
-    driveForward(s, 5, (t) => Math.sin(t * 0.7) * 0.12);
+    driveForward(s, 3, (t) => Math.sin(t * 0.7) * 0.12);
     // Explosion ahead, staged after the drive so it is mid-blast in the frame.
     const ex = spawnExplosion(s.r.scene, s.THREE, 6, s.player.z + 34, true);
     ex.t = 0.55; ex.group.scale.set(1.9, 1.45, 1.9);

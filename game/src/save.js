@@ -1,10 +1,13 @@
-// Save and load: cash, respect, jobs done, garage cars and the radio station,
-// kept in localStorage between visits. saveGame writes it; loadGame reads it
-// back or returns the fresh-start defaults. Nothing here ever throws.
-import { SAVE_KEY } from './config.js';
+// Save and load: cash, respect, jobs done, district standing, garage cars and
+// the radio station, kept in localStorage between visits. saveGame writes it;
+// loadGame reads it back or returns the fresh-start defaults. Nothing here
+// ever throws.
+import { SAVE_KEY, DISTRICT_NAMES } from './config.js';
 
 export function freshSave() {
-  return { cash: 1250, respect: 0, jobsDone: [], garage: ['comet'], station: 0, best: 0, created: Date.now() };
+  const standing = {};
+  for (const d of DISTRICT_NAMES) standing[d] = 0;
+  return { cash: 1250, respect: 0, jobsDone: [], standing, garage: ['comet'], station: 0, best: 0, created: Date.now() };
 }
 
 export function saveGame(save) {
@@ -16,7 +19,8 @@ export function loadGame() {
     const raw = window.localStorage.getItem(SAVE_KEY);
     if (!raw) return freshSave();
     const s = JSON.parse(raw);
-    return { ...freshSave(), ...s, jobsDone: Array.isArray(s.jobsDone) ? s.jobsDone : [], garage: Array.isArray(s.garage) ? s.garage : ['comet'] };
+    const standing = { ...freshSave().standing, ...(s.standing || {}) };
+    return { ...freshSave(), ...s, jobsDone: Array.isArray(s.jobsDone) ? s.jobsDone : [], standing, garage: Array.isArray(s.garage) ? s.garage : ['comet'] };
   } catch { return freshSave(); }
 }
 

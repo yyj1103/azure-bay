@@ -86,7 +86,7 @@ function runGame() {
     screen = 'over';
     setScreen(hud, 'over', sim.save);
     document.getElementById('over-title').textContent = sim.overReason || 'WASTED';
-    document.getElementById('over-sub').textContent = `Cash kept: $${Math.floor(sim.cash).toLocaleString()} · Jobs done: ${sim.save.jobsDone.length}/8`;
+    document.getElementById('over-sub').textContent = `Cash kept: $${Math.floor(sim.cash).toLocaleString()} · Jobs done: ${sim.save.jobsDone.length}/10`;
     document.getElementById('hud').style.display = 'none';
   }
 
@@ -98,7 +98,7 @@ function runGame() {
     if (!Number.isInteger(index)) return;
     enterPlay();
     startJob(sim, index);
-    showBanner(hud, `JOB ${index + 1}/8 — ${MISSIONS[index].title}`, MISSIONS[index].dialogue, 4000);
+    showBanner(hud, `JOB ${index + 1}/10 — ${MISSIONS[index].title}`, MISSIONS[index].dialogue, 4000);
   });
   document.getElementById('start-roam').addEventListener('click', () => { enterPlay(); });
   document.getElementById('resume-btn').addEventListener('click', () => {

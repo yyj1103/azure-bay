@@ -4,7 +4,7 @@
 // police pursuit, wanted heat, mission stages, busted and wasted. getHudState
 // hands the HUD everything it shows. No drawing here; render.js paints it.
 import * as THREE from 'three';
-import { STEP, CITY, VEHICLES, WEAPONS, RADIO, CONTACTS } from './config.js';
+import { STEP, CITY, VEHICLES, WEAPONS, RADIO, CONTACTS, districtStanding } from './config.js';
 import { createRandom, pickRandom } from './random.js';
 import { createRenderer, createPlayerMesh, createMarker, createPackageMesh, updateCamera, renderFrame } from './render.js';
 import { buildCarMesh, createCar, driveCar, collides, pushOutOfColliders, stealCar, exitCar } from './vehicles.js';
@@ -65,7 +65,7 @@ export function startJob(s, index) {
   if (st.type === 'defeat') spawnEnemies(s, st);
   if (st.type === 'collect') spawnPackages(s, st.count);
   if (st.wanted) addWanted(s.police, st.wanted, s.now);
-  s.banner = { text: `JOB ${index + 1}/8 — ${active.def.title}`, sub: active.def.dialogue, until: s.time + 4 };
+  s.banner = { text: `JOB ${index + 1}/10 — ${active.def.title}`, sub: active.def.dialogue, until: s.time + 4 };
   s.audio.sting(true);
   return active;
 }
@@ -126,12 +126,15 @@ function completeMission(s) {
   s.cash += m.def.reward; s.respect += m.def.respect;
   s.save.cash = s.cash; s.save.respect = s.respect;
   if (!s.save.jobsDone.includes(m.def.id)) s.save.jobsDone.push(m.def.id);
+  // District standing: the job's respect also buys standing where it happened.
+  const dist = m.def.district;
+  s.save.standing[dist] = (s.save.standing[dist] || 0) + m.def.respect;
   if (m.def.id === 2 && s.player.car) { if (!s.save.garage.includes(s.player.car.defKey)) s.save.garage.push(s.player.car.defKey); }
   saveGame(s.save);
   if (s.respect >= 40) WEAPONS[4].locked = false;
   if (s.respect >= 80) WEAPONS[5].locked = false;
   s.police.wanted = 0; s.police.heat = 0;
-  s.banner = { text: `JOB COMPLETE — ${m.def.title}`, sub: `+$${m.def.reward.toLocaleString()} · +${m.def.respect} REP · ${s.save.jobsDone.length}/8 JOBS DONE`, until: s.time + 4 };
+  s.banner = { text: `JOB COMPLETE — ${m.def.title}`, sub: `+$${m.def.reward.toLocaleString()} · +${m.def.respect} REP · ${dist} ${districtStanding(s.save.standing[dist])} · ${s.save.jobsDone.length}/10 JOBS DONE`, until: s.time + 4 };
   s.audio.sting(true);
   s.mission = null;
 }
@@ -349,6 +352,7 @@ export function getHudState(s) {
     contactRole: s.mission ? (CONTACTS[MISSIONS[s.mission.index].contact].role || '') : '',
     wanted: s.police.wanted, cash: s.cash, respect: s.respect,
     district: districtAt(p.x, p.z), timeOfDay: 'GOLDEN HOUR · 7:42 PM',
+    standing: s.save.standing,
     units: s.police.units.map((u) => ({ name: u.name, dist: u.dist, role: u.role, x: u.car.x, z: u.car.z })),
     heli: !!s.police.heli,
     roadblocks: s.police.roadblocks.map((rb) => ({ dist: Math.round(Math.hypot(rb.x - p.x, rb.z - p.z)) })),

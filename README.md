@@ -4,7 +4,7 @@
 [![rank](https://make.fun/badge/gta6-01/yyj1103/azure-bay/rank.svg)](https://make.fun/bounty/gta6-01/leaderboard?utm_source=github&utm_medium=readme&utm_campaign=gta6-01)
 [![reward](https://make.fun/badge/gta6-01/yyj1103/azure-bay/reward.svg)](https://make.fun/bounty/gta6-01?utm_source=github&utm_medium=readme&utm_campaign=gta6-01)
 
-AZURE BAY is a 3D open-world crime game set in a sun-soaked coastal city. Drive and walk through the city, take on 8 story missions, evade a 5-star wanted system with police roadblocks and a helicopter, upgrade cars in the garage, and build respect across the bay.
+AZURE BAY is a 3D open-world crime game set in a sun-soaked coastal city. Drive and walk through the city, take on 10 story missions, evade a 5-star wanted system with police roadblocks and a helicopter, upgrade cars in the garage, and build respect across the bay.
 
 ## How to play
 
@@ -25,7 +25,8 @@ Pick a job on the title screen, or start free roam. Complete jobs to earn cash a
 
 ## Features
 
-- 8 story missions with three contacts — Marisol, Deacon, and Vera
+- 10 story missions with three contacts — Marisol, Deacon, and Vera, including two timed street races and a four-stage finale
+- District standing across five districts — Marina, Downtown, Harbour, Old Town, and Beachfront — rising from NEUTRAL to LEGEND as you finish jobs in each one
 - 5-star wanted system: ABPD police units, roadblocks, and the CONDOR-1 helicopter
 - On-foot and driving gameplay with carjacking, 5 vehicle types, traffic, and pedestrians
 - Deacon's Garage: buy armor, engine, and tire upgrades with earned cash
